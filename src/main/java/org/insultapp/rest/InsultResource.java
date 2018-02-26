@@ -29,6 +29,7 @@ public class InsultResource {
 				+ insultGenerator.insult();
 	}
 
+	@Path("/html")
 	@GET
 	@Produces(value = MediaType.TEXT_HTML)
 	public String insultHtml() {
