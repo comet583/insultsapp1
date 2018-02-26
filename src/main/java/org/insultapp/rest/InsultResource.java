@@ -29,6 +29,17 @@ public class InsultResource {
 				+ insultGenerator.insult();
 	}
 
+	@GET
+	@Produces(value = MediaType.TEXT_HTML)
+	public String insultHtml() {
+		return "<html><body><h1>Insult!</h1>"
+				+ "You requested an insult @"
+				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
+				+"<hr/><b>"
+				+ insultGenerator.insult()
+				+ "</b></body>";
+	}
+
 	@Path("/{name}")
 	@GET
 	@Produces(value = MediaType.TEXT_PLAIN)
