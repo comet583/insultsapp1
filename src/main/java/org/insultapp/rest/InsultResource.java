@@ -1,5 +1,8 @@
 package org.insultapp.rest;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,7 +24,9 @@ public class InsultResource {
 	@GET
 	@Produces(value = MediaType.TEXT_PLAIN)
 	public String insult() {
-		return insultGenerator.insult();
+		return "You requested an insult @"
+				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
+				+ insultGenerator.insult();
 	}
 
 	@Path("/{name}")
