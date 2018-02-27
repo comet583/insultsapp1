@@ -27,8 +27,7 @@ public class InsultResource {
 	@GET
 	@Produces(value = MediaType.TEXT_PLAIN)
 	public String insult() {
-		return "You requested an insult @"
-				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
+		return "You requested an insult @" + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
 				+ insultGenerator.insult();
 	}
 
@@ -36,14 +35,12 @@ public class InsultResource {
 	@GET
 	@Produces(value = MediaType.TEXT_HTML)
 	public String insultHtml() {
-		String buildTime= getBuildTime();
-		return "<html><body><h1>Insult " + ++_visits + "!</h1>"
-				+ "You requested an insult @"
-				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
-				+"<hr/><b>"
-				+ insultGenerator.insult()
-				+ "</b><br/>"
-				+ "<i>" + buildTime + "</i>"
+		String buildTime = getBuildTime();
+		String gitCommit= getGitProperties();
+		return "<html><body><h1>Insult " + ++_visits + "!</h1>" + "You requested an insult @"
+				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()) + "<hr/><br/><b>\""
+				+ insultGenerator.insult() + "\"</b><br/><br/>" + "<i>last build: " + buildTime + "</i> "
+				+ _gitCommitId + " : " + _gitCommitMessageShort
 				+ "</body>";
 	}
 
@@ -53,20 +50,46 @@ public class InsultResource {
 	public String namedInsult(@PathParam("name") String name) {
 		return insultGenerator.namedInsult(name);
 	}
-	
+
+	private String _buildTime = null;
+	private String _pomVersion;
+
 	private String getBuildTime() {
-		String buildTime= "n/a";
-	ClassLoader classLoader = this.getClass().getClassLoader();
-	Properties prop = new Properties();
-	try {
-		InputStream stream= classLoader.getResourceAsStream("build.properties"); 
-	    prop.load(stream);
-	    buildTime = prop.getProperty("build.date");
-	    String pomVersion = prop.getProperty("version");
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    buildTime= e.getMessage();
+		if (_buildTime != null)
+			return _buildTime;
+		_buildTime = "n/a";
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		Properties prop = new Properties();
+		try {
+			InputStream stream = classLoader.getResourceAsStream("build.properties");
+			prop.load(stream);
+			_buildTime = prop.getProperty("build.date");
+			_pomVersion = prop.getProperty("version");
+		} catch (Exception e) {
+			e.printStackTrace();
+			_buildTime = e.getMessage();
+		}
+		return _buildTime;
 	}
-	return buildTime;
+	
+	private String _gitCommitId= null;
+	private String _gitCommitMessageShort= null;
+	private String getGitProperties() {
+		if (_gitCommitId != null)
+			return _gitCommitId;
+		_buildTime = "n/a";
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		Properties prop = new Properties();
+		try {
+			InputStream stream = classLoader.getResourceAsStream("git.properties");
+			prop.load(stream);
+			_gitCommitId = prop.getProperty("git.commit.id");
+			_gitCommitMessageShort = prop.getProperty("git.commit.message.short");
+		} catch (Exception e) {
+			e.printStackTrace();
+			_gitCommitId = e.getMessage();
+		}
+		return _gitCommitId;
 	}
-	}
+
+}
