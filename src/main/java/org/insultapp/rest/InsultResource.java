@@ -24,7 +24,7 @@ public class InsultResource {
 	@InsultGeneratorQualifier(type = InsultGeneratorType.INMEMORY)
 	private InsultGenerator insultGenerator;
 
-	@Path("/health")
+	@Path("/health/check")
 	@GET
 	@Produces(value = MediaType.TEXT_PLAIN)
 	public String healthCheck() {
