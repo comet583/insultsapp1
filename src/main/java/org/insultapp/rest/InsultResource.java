@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.insultapp.generators.InsultGenerator;
 import org.insultapp.generators.InsultGeneratorQualifier;
@@ -26,9 +27,15 @@ public class InsultResource {
 
 	@Path("/health/check")
 	@GET
-	@Produces(value = MediaType.TEXT_PLAIN)
-	public String healthCheck() {
-		return "OK at " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date());
+	public Response healthCheck() {
+		Date now= new Date();
+		// toss an unavailable every 10 minutes
+		if ( now.getMinutes() % 10 == 0 ) {
+			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
+		}
+		return Response.ok( 
+				"OK at " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(now),
+				MediaType.TEXT_PLAIN).build();
 	}
 
 	@GET
