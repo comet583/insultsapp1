@@ -24,6 +24,13 @@ public class InsultResource {
 	@InsultGeneratorQualifier(type = InsultGeneratorType.INMEMORY)
 	private InsultGenerator insultGenerator;
 
+	@Path("/health")
+	@GET
+	@Produces(value = MediaType.TEXT_PLAIN)
+	public String healthCheck() {
+		return "OK at " + new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date());
+	}
+
 	@GET
 	@Produces(value = MediaType.TEXT_PLAIN)
 	public String insult() {
