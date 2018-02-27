@@ -16,7 +16,7 @@ import org.insultapp.generators.InsultGeneratorType;
 
 @Path("/")
 public class InsultResource {
-
+	private static int _visits = 0;
 	@Inject
 	@InsultGeneratorQualifier(type = InsultGeneratorType.INMEMORY)
 	private InsultGenerator insultGenerator;
@@ -33,7 +33,7 @@ public class InsultResource {
 	@GET
 	@Produces(value = MediaType.TEXT_HTML)
 	public String insultHtml() {
-		return "<html><body><h1>Insult!</h1>"
+		return "<html><body><h1>Insult " + ++_visits + "!</h1>"
 				+ "You requested an insult @"
 				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date())
 				+"<hr/><b>"
