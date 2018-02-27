@@ -1,5 +1,7 @@
 package org.insultapp.rest;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -30,7 +32,7 @@ public class InsultResource {
 	public Response healthCheck() {
 		Date now= new Date();
 		// toss an unavailable every 10 minutes
-		if ( now.getMinutes() % 10 == 0 ) {
+		if ( now.getMinutes() % 30 == 0 ) {
 			return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
 		}
 		return Response.ok( 
@@ -45,15 +47,37 @@ public class InsultResource {
 				+ insultGenerator.insult();
 	}
 
+	private BufferedWriter _writer=null;
+	private BufferedWriter getWriter() {
+		if ( _writer == null ) {
+			try {
+				_writer= new BufferedWriter(new FileWriter("/mydata/lastvisit.txt"));
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		return _writer;
+	}
 	@Path("/html")
 	@GET
 	@Produces(value = MediaType.TEXT_HTML)
 	public String insultHtml() {
 		String buildTime = getBuildTime();
 		String gitCommit= getGitProperties();
+		String insult= insultGenerator.insult();
+		BufferedWriter writer= getWriter();
+		if ( writer != null ) {
+			try {
+				writer.write(insult + "\n");
+				writer.flush();
+			} catch (IOException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+		System.out.println("insult is " + insult);
 		return "<html><body><h1>Insult " + ++_visits + "!</h1>" + "You requested an insult @"
 				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()) + "<hr/><br/><b>\""
-				+ insultGenerator.insult() + "\"</b><br/><br/>" + "<i>last build: " + buildTime + "</i> "
+				+ insult + "\"</b><br/><br/>" + "<i>last build: " + buildTime + "</i> "
 				+ _gitCommitId + " : " + _gitCommitMessageShort
 				+ "</body>";
 	}
