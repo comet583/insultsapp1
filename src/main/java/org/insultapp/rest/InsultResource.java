@@ -47,7 +47,7 @@ public class InsultResource {
 				+ insultGenerator.insult();
 	}
 
-	private BufferedWriter _writer=null;
+	private static BufferedWriter _writer=null;
 	private BufferedWriter getWriter() {
 		if ( _writer == null ) {
 			try {
@@ -65,21 +65,26 @@ public class InsultResource {
 		String buildTime = getBuildTime();
 		String gitCommit= getGitProperties();
 		String insult= insultGenerator.insult();
+		_visits+= 1;
+		recordInsult(_visits,insult);
+		System.out.println("insult is " + insult);
+		return "<html><body><h1>Insult " + _visits + "!</h1>" + "You requested an insult @"
+				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()) + "<hr/><br/><b>\""
+				+ insult + "\"</b><br/><br/>" + "<i>last build: " + buildTime + "</i> "
+				+ _gitCommitId + " : " + _gitCommitMessageShort
+				+ "</body>";
+	}
+
+	private void recordInsult(int visit, String insult) {
 		BufferedWriter writer= getWriter();
 		if ( writer != null ) {
 			try {
-				writer.write(insult + "\n");
+				writer.write(visit + ": " + insult + "\n");
 				writer.flush();
 			} catch (IOException e) {
 				System.err.println(e.getMessage());
 			}
 		}
-		System.out.println("insult is " + insult);
-		return "<html><body><h1>Insult " + ++_visits + "!</h1>" + "You requested an insult @"
-				+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss").format(new Date()) + "<hr/><br/><b>\""
-				+ insult + "\"</b><br/><br/>" + "<i>last build: " + buildTime + "</i> "
-				+ _gitCommitId + " : " + _gitCommitMessageShort
-				+ "</body>";
 	}
 
 	@Path("/{name}")
